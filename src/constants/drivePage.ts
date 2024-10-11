@@ -10,5 +10,5 @@ export const DrivePage = {
 export const DefaultDriveURLState = [{
   url: '',
   error: '',
-  id: 1,
+  id: '1',
 }];

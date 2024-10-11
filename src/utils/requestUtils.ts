@@ -1,4 +1,6 @@
-import { IRequestState } from "@/components/CreateRequestMainComponent";
+import { IRequestState } from "@/interfaces/CreateRequest.interface";
+
+const WhiteListedUrls = ["http://drive.google.com", "https://drive.google.com"];
 
 const isUrlValid = (url: string) => {
   if (!url || typeof url !== "string") {
@@ -7,10 +9,15 @@ const isUrlValid = (url: string) => {
 
   try {
     const parsedUrl = new URL(url);
-    return (
-      parsedUrl.pathname !== "/" &&
-      parsedUrl.origin.startsWith("http://drive.google.com")
-    );
+    for (let i = 0; i < WhiteListedUrls.length; i++) {
+      if (
+        parsedUrl.pathname !== "/" &&
+        parsedUrl.origin.startsWith(WhiteListedUrls[i])
+      ) {
+        return true;
+      }
+    }
+    return false;
   } catch (error) {
     return false;
   }
@@ -40,3 +47,6 @@ export const validateRequest = (request: IRequestState[]) => {
     request: updateRequestState,
   };
 };
+
+export const generateId = () =>
+  "_" + Math.random().toString(36).substring(2, 11);
