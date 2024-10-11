@@ -1,4 +1,5 @@
-import { CreateRequestMainComponent, IRequest } from "@/components/CreateRequestMainComponent";
+import { CreateRequestMainComponent } from "@/components/CreateRequestMainComponent";
+import { IRequest } from "@/interfaces/CreateRequest.interface";
 export default function Home() {
 
   const onRequestSubmit = (request: IRequest[]) => {
