@@ -1,58 +1,77 @@
 import React, { useState } from "react";
-import { Modal, Button, TextInput } from "flowbite-react";
-import { HiPlus, HiX } from "react-icons/hi";
+import Layout from "./Layout";
+import { DrivePage } from "@/constants";
+import { DefaultDriveURLState } from "@/constants/drivePage";
+import { generateId, validateRequest } from "@/utils/requestUtils";
+import { CreateRequestHeader } from "./CreateRequestHeader";
+import { CreateRequestFooter } from "./CreateRequestFooter";
+import {
+  CreateRequestMainComponentProps,
+  IRequestState,
+} from "@/interfaces/CreateRequest.interface";
+import { CreateRequestItem } from "./CreateRequestItem";
+import { useInputList } from "@/hooks/useInputList";
+import { AddUrlButton } from "./AddUrlButton";
 
-interface CreateRequestMainComponentProps {
-}
 export function CreateRequestMainComponent(
   props: CreateRequestMainComponentProps
 ) {
+  const { items, addItem, updateItem, deleteItem, setItems } =
+    useInputList<IRequestState>([...DefaultDriveURLState]);
+
+  const onCreateRequest = () => {
+    const { isValid, request: newRequest } = validateRequest(items);
+    if (!isValid) {
+      setItems(newRequest);
+      return;
+    }
+    props.onRequestSubmit(
+      newRequest.map((req) => ({
+        url: req.url,
+        value: req.value as string,
+      }))
+    );
+  };
+
+  const addUrl = () => {
+    if (items.length >= 10) {
+      return;
+    }
+    addItem({ ...DefaultDriveURLState[0], id: generateId() });
+  };
+
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center justify-between p-2 border-b rounded-t">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white font-extrabold">
-          Create New Request
-        </h3>
-        <button
-          className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-        >
-          <HiX className="w-5 h-5" />
-        </button>
-      </div>
-      <div className="p-6 space-y-6">
+    <>
+      <Layout
+        header={<CreateRequestHeader />}
+        footer={<CreateRequestFooter onCreateRequest={onCreateRequest} />}
+        alignCenter
+      >
         <div>
-          <h4 className="text-lg font-bold text-gray-900 dark:text-white">
-            Add videos or folders
+          <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+            {DrivePage.addVideosOrFolders}
           </h4>
-          <p className="text-sm text-gray-900 dark:text-gray-400">
-            These videos would be cut, labeled and made available in your
-            Recharm video library
+          <p className="text-xs text-gray-900 dark:text-gray-400">
+            {DrivePage.videoInstruction}
           </p>
         </div>
-
-        <div>
-          <Button
-            color="light"
-            className="text-sm font-medium hover:text-purple-800 bg-white hover:bg-gray-50 border border-gray-300"
-          >
-            <span className="flex items-center">
-              <span className="bg-purple-800 rounded-full p-0.5 mr-2">
-                <HiPlus className="h-3 w-3 text-white" />
-              </span>
-              Add URL
-            </span>
-          </Button>
+        <div className="mb-7 mt-4">
+          {items.map((urlData, idx) => (
+            <CreateRequestItem
+              key={urlData.id}
+              urlData={urlData}
+              updateItem={(e) => updateItem(idx, e)}
+              deleteItem={() => deleteItem(idx)}
+              canDelete={items.length > 1}
+              label={`${DrivePage.videoOrFolderUrl} ${idx + 1}`}
+              autoFocus={idx !== 0 && idx === items.length - 1}
+            />
+          ))}
         </div>
-      </div>
-
-      <div className="flex items-center justify-end p-4 border-t border-gray-200 rounded-b">
-        <Button
-          color="primary"
-          className="text-sm font-medium bg-purple-700 hover:bg-purple-800"
-        >
-          Create Request
-        </Button>
-      </div>
-    </div>
+        <div>
+          <AddUrlButton addUrl={addUrl} items={items} />
+        </div>
+      </Layout>
+    </>
   );
 }

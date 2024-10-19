@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.input-right-icon input {
+  padding-right: 2rem;
+}
+
+.input-icon-top {
+  top: 0.9rem;
+}
